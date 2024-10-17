@@ -6,16 +6,16 @@ module.exports = {
   entry: './src/bootstrap.js',
   mode: 'development',
   output: {
-    publicPath: 'http://localhost:3001/',
+    publicPath: 'auto', // Allows Webpack to dynamically determine the public path
+    clean: true, // Ensures output directory is cleaned before build
   },
   resolve: {
-    extensions: ['.js', '.jsx'],
+    extensions: ['.js', '.jsx', '.css'],
   },
   devServer: {
-    port: 3001,
-    static: {
-      directory: path.join(__dirname, 'dist'),
-    },
+    port: 3001, // Or whichever port you prefer
+    static: './dist', // Replace '/app/dist' if it doesn’t exist
+    hot: true,
   },
   module: {
     rules: [
@@ -24,18 +24,22 @@ module.exports = {
         use: 'babel-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'], // Ensures CSS is processed and injected
+      },
     ],
   },
   plugins: [
     new ModuleFederationPlugin({
-      name: 'pandaSon',
+      name: 'container', // Use an appropriate name for each container
       filename: 'remoteEntry.js',
       exposes: {
         './App': './src/App',
       },
-      shared: { 
-        react: { singleton: true, eager: true }, 
-        'react-dom': { singleton: true, eager: true } 
+      shared: {
+        react: { singleton: true, eager: true },
+        'react-dom': { singleton: true, eager: true },
       },
     }),
     new HtmlWebpackPlugin({
